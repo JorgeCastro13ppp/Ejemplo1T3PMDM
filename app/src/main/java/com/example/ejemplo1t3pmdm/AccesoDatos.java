@@ -1,6 +1,5 @@
 package com.example.ejemplo1t3pmdm;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,57 +18,46 @@ public class AccesoDatos {
     public void ejemploMetodoConsultar(){
         SQLiteDatabase accesoLectura = miBD.getReadableDatabase();
 
-        Cursor c = accesoLectura.rawQuery("SELECT * FROM Ejemplares", null);
+        try {
+            Cursor c = accesoLectura.rawQuery("SELECT * FROM Ejemplares", null);
 
-        if (c.moveToFirst()){
-            do {
-                String titulo = c.getString(c.getColumnIndexOrThrow("titulo"));
-                String autor  = c.getString(c.getColumnIndexOrThrow("autor"));
-                Toast.makeText(contexto,
-                        "Título: " + titulo + " | Autor: " + autor,
-                        Toast.LENGTH_LONG).show();
-            } while (c.moveToNext());
-        } else {
-            Toast.makeText(contexto,"No hay registros aún", Toast.LENGTH_LONG).show();
+            if (c.moveToFirst()){
+                do {
+                    String titulo = c.getString(c.getColumnIndexOrThrow("titulo"));
+                    String autor  = c.getString(c.getColumnIndexOrThrow("autor"));
+
+                    Toast.makeText(contexto,
+                            "Leyendo → " + titulo + " / " + autor,
+                            Toast.LENGTH_LONG).show();
+
+                } while (c.moveToNext());
+            } else {
+                Toast.makeText(contexto,"No hay registros", Toast.LENGTH_LONG).show();
+            }
+
+            c.close();
+        } catch (Exception e){
+            Toast.makeText(contexto,"Error al consultar: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
-
-        c.close();
     }
 
     public void ejemploMetodoModificacion(){
         SQLiteDatabase accesoEscritura = miBD.getWritableDatabase();
 
-        /*
         try {
             accesoEscritura.execSQL(
-                    "INSERT INTO Ejemplares(titulo, autor, anio, prestado) " +
-                    "VALUES ('Los miserables','Soraya','2000', 0)"
+                    "INSERT INTO Ejemplares (titulo,autor,anio,prestado) " +
+                            "VALUES ('Los miserables','Soraya','2000',0)"
             );
 
             Toast.makeText(contexto,
-                    "Registro insertado correctamente mediante execSQL",
+                    "Registro insertado correctamente",
                     Toast.LENGTH_LONG).show();
 
-            } catch (Exception e) {
+        } catch (Exception e){
             Toast.makeText(contexto,
-                    "Error al insertar registro: " + e.getMessage(),
+                    "Error insertando registro: " + e.getMessage(),
                     Toast.LENGTH_LONG).show();
-            }
-        }
-         */
-
-        ContentValues registro = new ContentValues();
-        registro.put("titulo","Los miserables");
-        registro.put("autor","Soraya");
-        registro.put("anio",2000);
-        registro.put("prestado",0); // 0 = false, 1 = true
-
-        long resultado = accesoEscritura.insert("Ejemplares", null, registro);
-
-        if(resultado != -1){
-            Toast.makeText(contexto,"Registro creado con id: "+resultado, Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(contexto,"Error al insertar", Toast.LENGTH_LONG).show();
         }
     }
 }
